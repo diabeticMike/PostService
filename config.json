@@ -1,0 +1,15 @@
+{
+    "ListenPort": ":8080",
+    
+    "RedisConfig":{
+      "Address": "localhost:6379",
+      "Password": "",
+      "DB": 0
+    },
+
+    "Log" : {
+      "Level": 6,
+      "ServiceName": "postService",
+      "FileName": "./postService.log"
+    }
+}
