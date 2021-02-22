@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/PostService/config"
+	"github.com/PostService/infrastructure/config"
 	log "github.com/sirupsen/logrus"
 )
 
