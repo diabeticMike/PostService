@@ -23,6 +23,8 @@ func New(log logger.Logger, rc *redis.Client) (router *mux.Router,
 	postSvc := post.NewPostService(postCache.NewPostCache(rc))
 	postCntr := controller.NewPostController(log, postSvc)
 	router.HandleFunc("/post", postCntr.InsertPost).Methods(http.MethodPost)
+	router.HandleFunc("/post", postCntr.GetPosts).Methods(http.MethodGet)
+	router.HandleFunc("/post/{author}", postCntr.GetPostsByAuthor).Methods(http.MethodGet)
 
 	headers = handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
 	methods = handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
