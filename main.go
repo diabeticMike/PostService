@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
 	baseLog "log"
+	"net/http"
+	"strings"
 
 	"github.com/PostService/infrastructure/config"
 	"github.com/PostService/infrastructure/datastore"
 	"github.com/PostService/infrastructure/logger"
-	"github.com/PostService/internal/post/cache"
+	"github.com/PostService/web/router"
 	"github.com/go-redis/redis"
+	"github.com/gorilla/handlers"
 )
 
 func main() {
@@ -24,13 +26,11 @@ func main() {
 	if conf, err = config.New(configFilePath); err != nil {
 		baseLog.Fatal(err.Error())
 	}
-	fmt.Println(conf)
 
 	// Create service logger
 	if log, err = logger.New(conf.Log); err != nil {
 		baseLog.Fatal(err.Error())
 	}
-	fmt.Println(log)
 
 	if redisClient, err = datastore.NewRedis(redis.Options{
 		Addr:     conf.Redis.Address,
@@ -39,13 +39,19 @@ func main() {
 	}); err != nil {
 		log.Fatal(err.Error())
 	}
-	pIntf := cache.NewPostCache(redisClient)
+
+	requestInfo := func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ip := strings.Split(r.RemoteAddr, ":")[0]
+			message := " | " + ip + " | " + r.Method + " | " + r.URL.RequestURI()
+			log.Info("main", message)
+			h.ServeHTTP(w, r)
+		})
+	}
+
+	mainRouter, headers, methods, origins, err := router.New(log, redisClient)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	resp, err := pIntf.GetPostsByKey("shit")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	fmt.Println(resp)
+	log.Fatal(http.ListenAndServe(conf.ListenPort, requestInfo(handlers.CORS(headers, methods, origins)(mainRouter))))
 }
