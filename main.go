@@ -3,7 +3,6 @@ package main
 import (
 	baseLog "log"
 	"net/http"
-	"strings"
 
 	"github.com/PostService/infrastructure/config"
 	"github.com/PostService/infrastructure/datastore"
@@ -42,8 +41,7 @@ func main() {
 
 	requestInfo := func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ip := strings.Split(r.RemoteAddr, ":")[0]
-			message := " | " + ip + " | " + r.Method + " | " + r.URL.RequestURI()
+			message := " | " + r.Method + " | " + r.URL.RequestURI()
 			log.Info("main", message)
 			h.ServeHTTP(w, r)
 		})
