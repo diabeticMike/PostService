@@ -54,6 +54,7 @@ func (s *service) GetPostsByKey(key string) ([]model.Post, error) {
 		if err := json.Unmarshal([]byte(v), &post); err != nil {
 			return nil, err
 		}
+		postList = append(postList, post)
 	}
 	return postList, nil
 }
