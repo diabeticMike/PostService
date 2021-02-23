@@ -48,7 +48,11 @@ func (pc *PostController) InsertPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte(`Information stored successfully`))
+	if _, err := w.Write([]byte(`Information stored successfully`)); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pc.log.Error(err.Error())
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -83,7 +87,11 @@ func (pc *PostController) GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(posts) == 0 {
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(`No posts found`))
+		if _, err := w.Write([]byte(`No posts found`)); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			pc.log.Error(err.Error())
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -125,7 +133,11 @@ func (pc *PostController) GetPostsByAuthor(w http.ResponseWriter, r *http.Reques
 	author, ok := mux.Vars(r)["author"]
 	if !ok {
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(`No author provided`))
+		if _, err := w.Write([]byte(`No author provided`)); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			pc.log.Error(err.Error())
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -137,7 +149,11 @@ func (pc *PostController) GetPostsByAuthor(w http.ResponseWriter, r *http.Reques
 	}
 	if len(posts) == 0 {
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(`No posts found`))
+		if _, err := w.Write([]byte(`No posts found`)); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			pc.log.Error(err.Error())
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		return
 	}

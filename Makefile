@@ -23,4 +23,4 @@ up:
 
 .PHONY: lint
 lint:
-	cd ./src && golangci-lint run ./... --verbose --no-config --out-format checkstyle > golangci-lint.out;
+	golangci-lint run ./... --verbose --no-config --out-format checkstyle > golangci-lint.out;
