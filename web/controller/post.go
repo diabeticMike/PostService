@@ -24,6 +24,27 @@ type PostController struct {
 }
 
 // InsertPost create post record
+// /post:
+//	 post:
+//	       tags:
+//	         - developers
+//	       summary: insert post object
+//	       requestBody:
+//	         description: post object
+//	         required: true
+//	         content:
+//	           application/json:
+//	             schema:
+//	               $ref: '#/components/schemas/Post'
+//	       operationId: insertPost
+//	       description: insert post object
+//	       responses:
+//	         '201':
+//	           description: Information stored successfully
+//	         '400':
+//	           description: 'invalid input, object invalid'
+//	         '500':
+//	           description: service error
 func (pc *PostController) InsertPost(w http.ResponseWriter, r *http.Request) {
 	var post = struct {
 		Name   string `json:"post_name"`
@@ -56,7 +77,47 @@ func (pc *PostController) InsertPost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// GetPosts posts objects
+// GetPosts return posts objects
+// /post:
+//     get:
+//       tags:
+//         - developers
+//       summary: return list of posts by post_name or/and author name
+//       operationId: get posts
+//       description: |
+//         By passing in the appropriate options, get posts objects
+//       parameters:
+//         - in: query
+//           name: post_name
+//           description: post_name for searching
+//           required: false
+//           schema:
+//             type: string
+//         - in: query
+//           name: author
+//           description: author for searching
+//           required: false
+//           schema:
+//             type: string
+//         - in: query
+//           name: order
+//           description: does need ordering
+//           required: false
+//           schema:
+//             type: boolean
+//       responses:
+//         '200':
+//           description: search results matching criteria
+//           content:
+//             application/json:
+//               schema:
+//                 type: array
+//                 items:
+//                   $ref: '#/components/schemas/Post'
+//         '400':
+//           description: bad input parameter
+//         '500':
+//           description: service error
 func (pc *PostController) GetPosts(w http.ResponseWriter, r *http.Request) {
 	var (
 		err   error
@@ -100,19 +161,12 @@ func (pc *PostController) GetPosts(w http.ResponseWriter, r *http.Request) {
 	responce := []byte{}
 	if order == "true" {
 		sort.Sort(&posts)
-		responce, err = json.Marshal(posts)
-		if err != nil {
-			pc.log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		responce, err = json.Marshal(posts)
-		if err != nil {
-			pc.log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	}
+	responce, err = json.Marshal(posts)
+	if err != nil {
+		pc.log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -124,7 +178,41 @@ func (pc *PostController) GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetPosts posts objects
+// GetPostsByAuthor return posts objects
+// /post/{author}:
+//     get:
+//       tags:
+//         - developers
+//       summary: return list of posts by author name
+//       operationId: getPostsByAuthor
+//       description: |
+//         By passing in the appropriate options, get posts objects
+//       parameters:
+//         - in: path
+//           name: author
+//           description: author for searching
+//           required: true
+//           schema:
+//             type: string
+//         - in: query
+//           name: order
+//           description: does need ordering
+//           required: false
+//           schema:
+//             type: boolean
+//       responses:
+//         '200':
+//           description: search results matching criteria
+//           content:
+//             application/json:
+//               schema:
+//                 type: array
+//                 items:
+//                   $ref: '#/components/schemas/Post'
+//         '400':
+//           description: bad input parameter
+//         '500':
+//           description: service error
 func (pc *PostController) GetPostsByAuthor(w http.ResponseWriter, r *http.Request) {
 	var (
 		err   error
@@ -163,19 +251,12 @@ func (pc *PostController) GetPostsByAuthor(w http.ResponseWriter, r *http.Reques
 	responce := []byte{}
 	if order == "true" {
 		sort.Sort(&posts)
-		responce, err = json.Marshal(posts)
-		if err != nil {
-			pc.log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		responce, err = json.Marshal(posts)
-		if err != nil {
-			pc.log.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	}
+	responce, err = json.Marshal(posts)
+	if err != nil {
+		pc.log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
