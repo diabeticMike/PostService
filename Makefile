@@ -1,6 +1,7 @@
 packages =  \
   ./infrastructure/config \
   ./internal/post \
+  ./web/controller \
 
 .PHONY: test
 test: 
